@@ -1,22 +1,30 @@
 ﻿using System;
+using Microsoft.Azure.Cosmos.Table;
 using Newtonsoft.Json;
 
 namespace ChonkyReviews.Models
 {
-    public class Location
+    public class Location : BaseEntity
     {
-        [JsonIgnore]
-        public string LocationId;
+        [JsonIgnore, IgnoreProperty]
+        public string LocationId { get; private set; }
 
-        [JsonIgnore]
-        public Account Account;
+        [JsonIgnore, IgnoreProperty]
+        public string AccountId { get; private set; }
+
+        [JsonIgnore, IgnoreProperty]
+        public Account Account => null;
+
+        [JsonProperty, IgnoreProperty]
+        public string Name => $"accounts/{AccountId}/locations/{LocationId}";
 
         [JsonProperty]
-        public string Name => $"accounts/{Account.AccountId}/locations/{LocationId}";
+        public string LocationName { get; private set; }
 
-        public Location()
-        {
+        [JsonIgnore]
+        public override string PartitionKey { get => AccountId; set => AccountId = value; }
 
-        }
+        [JsonIgnore]
+        public override string RowKey { get => LocationId; set => LocationId = value; }
     }
 }

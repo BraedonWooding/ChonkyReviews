@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+
 namespace ChonkyReviews.Models
 {
     public class Review
@@ -15,21 +17,37 @@ namespace ChonkyReviews.Models
 
         public class Reply
         {
+            [JsonProperty]
             public string Comment { get; private set; }
 
             // Zulu time
+            [JsonProperty]
             public DateTimeOffset UpdateTime { get; private set; }
         }
 
+        [JsonProperty]
         public string Name { get; private set; }
+
+        [JsonProperty]
         public string ReviewId { get; private set; }
+
+        [JsonProperty]
         public Reviewer Reviewer { get; private set; }
+
+        [JsonProperty]
         public StarRatings StarRating { get; private set; }
+
+        [JsonProperty]
         public string Comment { get; private set; }
 
         // Zulu time
+        [JsonProperty]
         public DateTimeOffset CreateTime { get; private set; }
+
+        [JsonProperty]
         public DateTimeOffset UpdateTime { get; private set; }
+
+        [JsonProperty]
         public Reply ReviewReply { get; private set; }
     }
 }
