@@ -3,8 +3,6 @@ name: .NET
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build:
@@ -23,7 +21,7 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Build
+    - name: Test
       run: dotnet test --no-restore
     - name: Generate Swagger
       run: swagger tofile --output "openapi.json" ./ChonkyReviews/bin/Debug/net5.0/ChonkyReviews.dll ChonkyReviews
