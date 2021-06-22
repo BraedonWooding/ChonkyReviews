@@ -37,7 +37,7 @@ namespace ChonkyReviews
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ChonkyReviews", Version = "v1" });
+                c.SwaggerDoc("ChonkyReviews", new OpenApiInfo { Title = "ChonkyReviews", Version = "v1" });
             });
         }
 
