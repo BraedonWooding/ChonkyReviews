@@ -28,6 +28,7 @@ jobs:
     - name: Generate Swagger UI
       uses: Legion2/swagger-ui-action@v1
       with:
+        tryItOutEnabled: false
         output: swagger-ui
         spec-file: openapi.json
     - name: Deploy 🚀
