@@ -59,10 +59,7 @@ export default defineComponent({
       users.value = resp.data;
     }
 
-    const filterFn = (
-      val: string,
-      update: (arg: () => void) => void
-    ) => {
+    const filterFn = (val: string, update: (arg: () => void) => void) => {
       update(() => {
         const needle = val.toLowerCase();
         filteredUsers.value = users.value.filter(

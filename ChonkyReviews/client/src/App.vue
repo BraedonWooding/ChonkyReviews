@@ -77,6 +77,10 @@
     </q-drawer>
 
     <q-page-container>
+      <q-ajax-bar
+        color="primary"
+        size="10px"
+      />
       <router-view />
     </q-page-container>
   </q-layout>

@@ -116,37 +116,38 @@ namespace ChonkyReviews.Controllers
             string userToken = GetUserToken();
             string lastId = null;
 
-            var locs = _tableStorage.LookupEntities<Review>("Reviews", locationId, pageToken, pageSize)
-                .Select(x =>
-                {
-                    lastId = x.LocationId;
-                    return new GMock_Review(x.Name, x.ReviewId, new GMock_Reviewer(x.Reviewer.ProfilePictureUrl, x.Reviewer.DisplayName, x.Reviewer.IsAnonymous),
-                        x.StarRating, x.Comment, x.UpdateTime.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"),
-                        x.UpdateTime.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"),
-                        new GMock_ReviewReply(x.ReviewReply.Comment, x.ReviewReply.UpdateTime.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'")));
-                });
+            string table = "ReviewsUpdateTimeMappingDesc";
+
             if (isDesc)
             {
                 if (isRating)
                 {
-                    locs = locs.OrderByDescending(x => x.StarRating);
+                    table = "ReviewsRatingMappingDesc";
                 }
                 else
                 {
-                    locs = locs.OrderByDescending(x => x.UpdateTime);
+                    table = "ReviewsUpdateTimeMappingDesc";
                 }
             }
             else if (isRating)
             {
-                locs = locs.OrderBy(x => x.StarRating);
-            }
-            else
-            {
-                locs = locs.OrderByDescending(x => x.UpdateTime);
+                table = "ReviewsRatingMappingAsc";
             }
 
+            var locs = _tableStorage.LookupEntities<AggregatedMapping>(table, locationId, pageToken, pageSize)
+                .SelectAwait(async x =>
+                {
+                    var review = await _tableStorage.LookupEntity<Review>("Reviews", new Review(locationId, x.Reference));
+                    lastId = review.LocationId;
+                    return new GMock_Review(review.Name, review.ReviewId, new GMock_Reviewer(review.Reviewer.ProfilePictureUrl, review.Reviewer.DisplayName, review.Reviewer.IsAnonymous),
+                        review.StarRating, review.Comment, review.UpdateTime.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"),
+                        review.UpdateTime.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"),
+                        new GMock_ReviewReply(review.ReviewReply.Comment, review.ReviewReply.UpdateTime.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'")));
+                })
+                .ToListAsync();
+
             var ledger = await _tableStorage.ReadLedger("Location", locationId, "Reviews");
-            return Ok(new GMock_ListReviewsResult(await locs.ToListAsync(), (double)ledger.Sum / ledger.Count, ledger.Count, lastId));
+            return Ok(new GMock_ListReviewsResult(await locs, (double)ledger.Sum / ledger.Count, ledger.Count, lastId));
         }
 
         private async Task<bool> CanAccess(string accountId, string locationId = null)

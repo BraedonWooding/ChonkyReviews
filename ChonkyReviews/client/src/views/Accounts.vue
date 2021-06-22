@@ -5,7 +5,7 @@
       <UserSelect :isVisitor="false" />
       <q-btn round color="primary" icon="add" @click="prompt = true" />
     </q-toolbar>
-    <q-list bordered>
+    <q-list bordered v-if="hasUser()">
       <q-item
         v-for="account in accounts"
         :key="account.accountId"
@@ -33,6 +33,7 @@
         </q-item-section>
       </q-item>
     </q-list>
+    <div class="text-h6" v-else>Select a user to get started (top right).</div>
     <q-dialog v-model="prompt">
       <q-card style="min-width: 350px">
         <q-card-section>
@@ -107,6 +108,8 @@ export default {
     const store = useStore();
 
     async function getAccounts() {
+      if (!store.state.currentUser) return;
+
       const resp = await axios.get("/api/account/all");
       accounts.value = await Promise.all(
         resp.data.map(async (x: any) => {
@@ -117,6 +120,8 @@ export default {
       );
     }
 
+    watch(store.state, getAccounts);
+
     async function createAccount() {
       await axios.post("/api/account", newAccount.value);
       await getAccounts();
@@ -124,7 +129,7 @@ export default {
 
     async function toggleAccess(id: string) {
       ((await hasAccess(id)) === true ? axios.delete : axios.put)(
-        `/api/account/access?accountId=${id}&email=${store.state.currentUser?.email}`
+        `/api/account/access?accountId=${id}&userId=${store.state.currentUser?.userId}`
       );
       await getAccounts();
     }
@@ -132,7 +137,7 @@ export default {
     async function hasAccess(id: string) {
       try {
         await axios.get(
-          `/api/account/access?accountId=${id}&email=${store.state.currentUser?.email}`
+          `/api/account/access?accountId=${id}&userId=${store.state.currentUser?.userId}`
         );
         return true;
       } catch (e) {
@@ -150,6 +155,7 @@ export default {
       hasAccess,
       toggleAccess,
       AccountTypes,
+      hasUser: () => store.state.currentUser != null,
     };
   },
 };

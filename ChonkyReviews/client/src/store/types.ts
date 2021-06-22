@@ -1,6 +1,7 @@
 export interface User {
   profileName: string;
   email: string;
+  userId: string;
 }
 
 export interface Account {

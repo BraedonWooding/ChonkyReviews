@@ -35,7 +35,7 @@ namespace ChonkyReviews.Controllers
         [HttpPost]
         public async Task UpdateVisitor([FromBody] UserIn user)
         {
-            await _tableStorage.MergeEntity("Visitors", new User(user.UserId) {
+            await _tableStorage.MergeEntity("Visitors", new User(user.UserId ?? Guid.NewGuid().ToString("N")) {
                 ProfileName = user.ProfileName,
                 Email = user.Email
             });

@@ -7,7 +7,7 @@
     <q-list bordered>
       <q-item
         v-for="user in users"
-        :key="user.email"
+        :key="user.userId"
         class="q-my-sm"
         clickable
         v-ripple
@@ -66,7 +66,7 @@ export default {
 
   setup(): any {
     const users: Ref<User[]> = ref([]);
-    const newUser: Ref<User> = ref({ profileName: "", email: "" });
+    const newUser: Ref<User> = ref({ profileName: "", email: "", userId: "" });
 
     async function getUsers() {
       const resp = await axios.get("/api/user/all");

@@ -18,8 +18,8 @@ namespace ChonkyReviews.Services
         {
         }
 
-        public Int64 Count;
-        public Int64 Sum;
+        public Int64 Count { get; set; }
+        public Int64 Sum { get; set; }
     }
 
     public class TableStorageService
@@ -203,9 +203,10 @@ namespace ChonkyReviews.Services
 
             TableResult res;
             T exists = await LookupEntity(tableName, entity);
+            entity.ETag = exists?.ETag;
             if (exists != null)
             {
-                res = await table.ExecuteAsync(TableOperation.Merge(new TableStorageEntityAdapter<T>(entity)));
+                res = await table.ExecuteAsync(TableOperation.Replace(new TableStorageEntityAdapter<T>(entity)));
             }
             else
             {

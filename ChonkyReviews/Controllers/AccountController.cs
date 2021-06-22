@@ -39,7 +39,7 @@ namespace ChonkyReviews.Controllers
                 AccountName = account.AccountName
             })).Item3)
             {
-                await _tableStorage.IncrementLedger("Account", accountId, "__Identity__");
+                await _tableStorage.IncrementLedger("Account", "__Identity__", "__Identity__");
             }
         }
 

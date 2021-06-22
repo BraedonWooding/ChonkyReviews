@@ -4,7 +4,7 @@
       <q-toolbar-title>Reviews</q-toolbar-title>
       <UserSelect :isVisitor="true" />
     </q-toolbar>
-    <q-list bordered>
+    <q-list bordered v-if="hasUser()">
       <q-item
         v-for="location in locations"
         :key="location.reviewId"
@@ -25,13 +25,17 @@
         <q-item-section>
           <q-btn
             color="primary"
-            @click="getCurrentReview(location.locationId), (prompt = true)"
+            @click="
+              (newReview = { comment: '', starRating: -1 }),
+                getCurrentReview(location.locationId)
+            "
             :label="!location.review ? 'Add Review' : 'Edit Review'"
           />
         </q-item-section>
       </q-item>
     </q-list>
-    <q-dialog v-model="prompt">
+    <div class="text-h6" v-else>Select a user to get started (top right).</div>
+    <q-dialog v-model="prompt" persistent>
       <q-card style="min-width: 350px">
         <q-card-section>
           <div class="text-h6">Review</div>
@@ -57,7 +61,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted, Ref, ref } from "vue";
+import { onMounted, Ref, ref, watch } from "vue";
 
 import axios from "axios";
 
@@ -99,17 +103,21 @@ export default {
       );
     }
 
+    watch(store.state, getLocations);
+
     async function getReview(locationId: string) {
       try {
         return (
           await axios.get(
-            `/api/review?locationId=${locationId}&userId=${store.state.currentUser?.email}`
+            `/api/review?locationId=${locationId}&userId=${store.state.currentVisitor?.userId}`
           )
         ).data;
       } catch (e) {
         return false;
       }
     }
+
+    const prompt = ref(false);
 
     async function getCurrentReview(locationId: string) {
       newReview.value = (await getReview(locationId)) || {
@@ -125,14 +133,16 @@ export default {
         },
       };
       newReview.value.locationId = locationId;
+      prompt.value = true;
     }
 
     async function saveReview() {
-      await axios.post(`/api/review?locationId=${newReview.value.locationId}`, {
+      const accountId = locations.value.find(f => f.locationId == newReview.value.locationId)?.accountId;
+
+      await axios.post(`/api/review?accountId=${accountId}&locationId=${newReview.value.locationId}`, {
         ...newReview.value,
         reviewer: {
-          ...store.state.currentUser,
-          userId: store.state.currentUser?.email,
+          ...store.state.currentVisitor,
         },
       });
       getLocations();
@@ -142,11 +152,12 @@ export default {
 
     return {
       locations,
-      prompt: ref(false),
+      prompt,
       newReview,
       saveReview,
       getReview,
       getCurrentReview,
+      hasUser: () => store.state.currentVisitor != null,
     };
   },
 };

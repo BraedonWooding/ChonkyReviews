@@ -40,7 +40,7 @@ namespace ChonkyReviews.Controllers
                 Email = user.Email
             })).Item3)
             {
-                _tableStorage.IncrementLedger("User", "__Identity__", 0);
+                await _tableStorage.IncrementLedger("User", "__Identity__", "__Identity__");
             }
         }
 

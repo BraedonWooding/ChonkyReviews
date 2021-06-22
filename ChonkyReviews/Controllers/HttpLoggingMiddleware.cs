@@ -26,7 +26,7 @@ namespace ChonkyReviews.Controllers
             }
             finally
             {
-                _logger.LogInformation($"Request {ctx.Request?.Method} {ctx.Request?.Path?.Value}?{ctx.Request?.QueryString?.Value} => {ctx.Response?.StatusCode}");
+                _logger.LogInformation($"Request {ctx.Request?.Method} {ctx.Request?.Path.Value}?{ctx.Request?.QueryString.Value} => {ctx.Response?.StatusCode}");
             }
         }
     }

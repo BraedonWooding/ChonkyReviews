@@ -5,7 +5,7 @@
       <UserSelect :isVisitor="false" />
       <q-btn round color="primary" icon="add" @click="prompt = true" />
     </q-toolbar>
-    <q-list bordered>
+    <q-list bordered v-if="hasUser()">
       <q-item
         v-for="location in locations"
         :key="location.locationId"
@@ -38,6 +38,7 @@
         </q-item-section>
       </q-item>
     </q-list>
+    <div class="text-h6" v-else>Select a user to get started (top right).</div>
     <q-dialog v-model="prompt">
       <q-card style="min-width: 350px">
         <q-card-section>
@@ -123,6 +124,8 @@ export default {
       );
     }
 
+    watch(store.state, getLocations);
+
     async function getAccounts() {
       const resp = await axios.get("/api/account/all");
       accounts.value = resp.data;
@@ -135,7 +138,7 @@ export default {
 
     async function toggleAccess(accountId: string, id: string) {
       ((await hasAccess(accountId, id)) === true ? axios.delete : axios.put)(
-        `/api/location/access?accountId=${accountId}&locationId=${id}&email=${store.state.currentUser?.email}`
+        `/api/location/access?accountId=${accountId}&locationId=${id}&userId=${store.state.currentUser?.userId}`
       );
       await getLocations();
     }
@@ -144,12 +147,12 @@ export default {
       try {
         try {
           await axios.get(
-            `/api/account/access?accountId=${accountId}&email=${store.state.currentUser?.email}`
+            `/api/account/access?accountId=${accountId}&userId=${store.state.currentUser?.userId}`
           );
           return null;
         } catch (e) {
           await axios.get(
-            `/api/location/access?accountId=${accountId}&locationId=${id}&email=${store.state.currentUser?.email}`
+            `/api/location/access?accountId=${accountId}&locationId=${id}&userId=${store.state.currentUser?.userId}`
           );
           return true;
         }
@@ -169,6 +172,7 @@ export default {
       hasAccess,
       toggleAccess,
       accounts,
+      hasUser: () => store.state.currentUser != null,
     };
   },
 };

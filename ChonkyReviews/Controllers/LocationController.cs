@@ -32,13 +32,15 @@ namespace ChonkyReviews.Controllers
         [HttpPost]
         public async Task UpdateLocation([FromBody] LocationIn location)
         {
+            if (string.IsNullOrEmpty(location.AccountId)) return;
+
             var locationId = "location_" + Guid.NewGuid().ToString("N");
             if ((await _tableStorage.MergeEntity("Locations", new Location(location.AccountId, locationId)
             {
                 LocationName = location.LocationName
             })).Item3)
             {
-                await _tableStorage.IncrementLedger("Location", locationId, "__Identity__");
+                await _tableStorage.IncrementLedger("Location", "__Identity__", "__Identity__");
             }
         }
 
@@ -87,12 +89,12 @@ namespace ChonkyReviews.Controllers
 
         [HttpGet]
         [Route("forUser")]
-        public async Task<List<Location>> GetForUser([FromBody] UserIn user)
+        public async Task<List<Location>> GetForUser(string userId)
         {
-            return await _tableStorage.LookupEntities<Mapping<User, Location>>("UsersToLocations", user.UserId)
+            return await _tableStorage.LookupEntities<Mapping<User, Location>>("UsersToLocations", userId)
                 .SelectAwait(async x => await _tableStorage.LookupEntity("Locations", new Location(x.ValueCategory, x.Value)))
                 .Concat(
-                    _tableStorage.LookupEntities<Mapping<User, Account>>("UsersToAccounts", user.UserId)
+                    _tableStorage.LookupEntities<Mapping<User, Account>>("UsersToAccounts", userId)
                         .SelectMany(x => _tableStorage.LookupEntities<Location>("Locations", x.Value))
                 )
                 .ToListAsync();

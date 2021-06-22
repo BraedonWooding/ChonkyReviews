@@ -36,6 +36,7 @@ namespace ChonkyReviews.Controllers
         [HttpPost]
         public async Task UpdateReview(string accountId, string locationId, [FromBody] ReviewIn review)
         {
+            var updateTime = DateTimeOffset.UtcNow;
             var (cur, old, inserted) = await _tableStorage.MergeEntity("Reviews", new Review(locationId, review.Reviewer.UserId) {
                 Reviewer = new Reviewer()
                 {
@@ -47,29 +48,44 @@ namespace ChonkyReviews.Controllers
                 ReviewReply = new Review.Reply()
                 {
                     Comment = review.ReviewReply.Comment,
-                    UpdateTime = DateTimeOffset.UtcNow
+                    UpdateTime = updateTime
                 },
-                UpdateTime = DateTimeOffset.UtcNow,
-                CreateTime = DateTimeOffset.UtcNow,
+                UpdateTime = updateTime,
+                CreateTime = updateTime,
                 StarRating = review.StarRating,
             });
 
             int oldValue = old == null ? 0 : Math.Max((int)old.StarRating, 0);
             int curValue = cur == null ? 0 : Math.Max((int)cur.StarRating, 0);
 
+            if (old != null)
+            {
+                Task.WaitAll(_tableStorage.DeleteEntity("ReviewsRatingMappingAsc", new AggregatedMapping(locationId, oldValue.ToString(), cur.Reviewer.UserId)),
+                    _tableStorage.DeleteEntity("ReviewsRatingMappingDesc", new AggregatedMapping(locationId, (5 - oldValue).ToString(), cur.Reviewer.UserId)),
+                    _tableStorage.DeleteEntity("ReviewsUpdateTimeMappingDesc", new AggregatedMapping(locationId, (DateTimeOffset.MaxValue.UtcTicks - old.UpdateTime.UtcTicks).ToString("d19"), cur.Reviewer.UserId)));
+            }
+
+            Task.WaitAll(
+             _tableStorage.MergeEntity("ReviewsRatingMappingAsc", new AggregatedMapping(locationId, curValue.ToString(), cur.Reviewer.UserId)),
+             _tableStorage.MergeEntity("ReviewsRatingMappingDesc", new AggregatedMapping(locationId, (5 - curValue).ToString(), cur.Reviewer.UserId)),
+             _tableStorage.MergeEntity("ReviewsUpdateTimeMappingDesc", new AggregatedMapping(locationId, (DateTimeOffset.MaxValue.UtcTicks - cur.UpdateTime.UtcTicks).ToString("d19"), cur.Reviewer.UserId)));
+
             if ((inserted || old.StarRating == 0) && cur.StarRating != 0)
             {
-                await _tableStorage.IncrementLedger("Account", accountId, "Reviews", curValue);
-                await _tableStorage.IncrementLedger("User", review.Reviewer.UserId, "Reviews", curValue);
-                await _tableStorage.IncrementLedger("Location", locationId, "Reviews", curValue);
-                await _tableStorage.IncrementLedger("Reviews", cur.RowKey, "__Identity__", curValue);
+                Task.WaitAll(_tableStorage.IncrementLedger("Account", accountId, "Reviews", curValue),
+                    _tableStorage.IncrementLedger("User", cur.Reviewer.UserId, "Reviews", curValue),
+                    _tableStorage.IncrementLedger("Location", locationId, "Reviews", curValue),
+                    _tableStorage.IncrementLedger("Reviews", "__Identity__", "__Identity__", curValue)
+                );
             }
             else if (cur.StarRating != 0)
             {
-                await _tableStorage.MutateSumOfLedger("Account", accountId, "Reviews", curValue - oldValue);
-                await _tableStorage.MutateSumOfLedger("User", review.Reviewer.UserId, "Reviews", curValue - oldValue);
-                await _tableStorage.MutateSumOfLedger("Location", locationId, "Reviews", curValue - oldValue);
-                await _tableStorage.MutateSumOfLedger("Reviews", cur.RowKey, "__Identity__", curValue - oldValue);
+                Task.WaitAll(
+                _tableStorage.MutateSumOfLedger("Account", accountId, "Reviews", curValue - oldValue),
+                 _tableStorage.MutateSumOfLedger("User", cur.Reviewer.UserId, "Reviews", curValue - oldValue),
+                 _tableStorage.MutateSumOfLedger("Location", locationId, "Reviews", curValue - oldValue),
+                 _tableStorage.MutateSumOfLedger("Reviews", "__Identity__", "__Identity__", curValue - oldValue)
+                    );
             }
         }
 
