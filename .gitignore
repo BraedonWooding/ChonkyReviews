@@ -11,8 +11,8 @@ autom4te.cache/
 tarballs/
 test-results/
 
-ChonkyReviews/src/main.ts
-ChonkyReviews/src/quasar-user-options.ts
+main.ts
+quasar-user-options.ts
 ChonkyReviews/src/*.js
 ChonkyReviews/src/*.js.map
 
