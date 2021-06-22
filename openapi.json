@@ -124,7 +124,7 @@
             }
           },
           {
-            "name": "email",
+            "name": "userId",
             "in": "query",
             "schema": {
               "type": "string"
@@ -150,7 +150,7 @@
             }
           },
           {
-            "name": "email",
+            "name": "userId",
             "in": "query",
             "schema": {
               "type": "string"
@@ -176,7 +176,7 @@
             }
           },
           {
-            "name": "email",
+            "name": "userId",
             "in": "query",
             "schema": {
               "type": "string"
@@ -243,6 +243,374 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/gmock/v4/accounts": {
+      "get": {
+        "tags": [
+          "GoogleMock"
+        ],
+        "parameters": [
+          {
+            "name": "pageToken",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_GetAccountsResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_GetAccountsResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_GetAccountsResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gmock/accountmanagement/v1/accounts": {
+      "get": {
+        "tags": [
+          "GoogleMock"
+        ],
+        "parameters": [
+          {
+            "name": "pageToken",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_GetAccountsResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_GetAccountsResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_GetAccountsResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gmock/v4/accounts/{accountId}/locations": {
+      "get": {
+        "tags": [
+          "GoogleMock"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageToken",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_GetLocationsResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_GetLocationsResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_GetLocationsResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gmock/v4/accounts/{accountId}/locations/{locationId}/reviews": {
+      "get": {
+        "tags": [
+          "GoogleMock"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageToken",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "updateTime desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_ListReviewsResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_ListReviewsResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_ListReviewsResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gmock/v4/accounts/{accountId}/locations/{locationId}/reviews/{reviewId}": {
+      "get": {
+        "tags": [
+          "GoogleMock"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reviewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_Review"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_Review"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GMock_Review"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gmock/v4/accounts/{accountId}/locations/{locationId}/reviews/{reviewId}/reply": {
+      "delete": {
+        "tags": [
+          "GoogleMock"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reviewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "GoogleMock"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reviewId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GMock_ReviewReply"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GMock_ReviewReply"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GMock_ReviewReply"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -380,7 +748,7 @@
             }
           },
           {
-            "name": "email",
+            "name": "userId",
             "in": "query",
             "schema": {
               "type": "string"
@@ -413,7 +781,7 @@
             }
           },
           {
-            "name": "email",
+            "name": "userId",
             "in": "query",
             "schema": {
               "type": "string"
@@ -446,7 +814,7 @@
             }
           },
           {
-            "name": "email",
+            "name": "userId",
             "in": "query",
             "schema": {
               "type": "string"
@@ -465,25 +833,15 @@
         "tags": [
           "Location"
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserIn"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserIn"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserIn"
-              }
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -561,6 +919,13 @@
           "Review"
         ],
         "parameters": [
+          {
+            "name": "accountId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "locationId",
             "in": "query",
@@ -759,7 +1124,7 @@
         ],
         "parameters": [
           {
-            "name": "email",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "string"
@@ -864,7 +1229,7 @@
         ],
         "parameters": [
           {
-            "name": "email",
+            "name": "userId",
             "in": "query",
             "schema": {
               "type": "string"
@@ -960,6 +1325,166 @@
         "type": "integer",
         "format": "int32"
       },
+      "GMock_Account": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountName": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/AccountType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GMock_GetAccountsResult": {
+        "type": "object",
+        "properties": {
+          "accounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GMock_Account"
+            },
+            "nullable": true
+          },
+          "nextPageToken": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GMock_GetLocationsResult": {
+        "type": "object",
+        "properties": {
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GMock_Location"
+            },
+            "nullable": true
+          },
+          "nextPageToken": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalSize": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GMock_ListReviewsResult": {
+        "type": "object",
+        "properties": {
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GMock_Review"
+            },
+            "nullable": true
+          },
+          "averageRating": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalReviewCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nextPageToken": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GMock_Location": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "locationName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GMock_Review": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "reviewId": {
+            "type": "string",
+            "nullable": true
+          },
+          "reviewer": {
+            "$ref": "#/components/schemas/GMock_Reviewer"
+          },
+          "starRating": {
+            "$ref": "#/components/schemas/StarRatings"
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true
+          },
+          "createTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "updateTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "reviewReply": {
+            "$ref": "#/components/schemas/GMock_ReviewReply"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GMock_Reviewer": {
+        "type": "object",
+        "properties": {
+          "profilePhotoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "displayName": {
+            "type": "string",
+            "nullable": true
+          },
+          "isAnonymous": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GMock_ReviewReply": {
+        "type": "object",
+        "properties": {
+          "comment": {
+            "type": "string",
+            "nullable": true
+          },
+          "updateTime": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "Location": {
         "type": "object",
         "properties": {
@@ -1040,7 +1565,8 @@
           },
           "name": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "readOnly": true
           },
           "reviewId": {
             "type": "string",
@@ -1076,6 +1602,10 @@
             "nullable": true
           },
           "locationId": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountId": {
             "type": "string",
             "nullable": true
           },
@@ -1207,6 +1737,10 @@
             "nullable": true
           },
           "profileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "userId": {
             "type": "string",
             "nullable": true
           }
