@@ -20,7 +20,7 @@ No authorization scope logic is implemented, furthermore no *real* permission/se
 
 - [x] [`v4/accounts.locations.reviews`](https://developers.google.com/my-business/reference/rest/v4/accounts.locations.reviews) and all subpath api calls
 - [x] [`v4/accounts.locations.list`](https://developers.google.com/my-business/reference/rest/v4/accounts.locations/list) list locations.
-- [x] [`v4/accounts.list`]
+- [x] [`v4/accounts.list`](https://developers.google.com/my-business/reference/rest/v4/accounts/list)
 
 ### My Business API Account Management v1
 
