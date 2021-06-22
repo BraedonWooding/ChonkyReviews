@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Azure.Cosmos.Table;
+using System;
 namespace ChonkyReviews.Models
 {
     public abstract class BaseEntity

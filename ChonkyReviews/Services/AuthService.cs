@@ -28,15 +28,6 @@ namespace ChonkyReviews.Services
 
         public async Task AddAuthCookie(HttpContext context, string googleId, string email)
         {
-            context.Response.Cookies.Append(COOKIE_NAME,
-                _protector.Protect((await _tableStorage.LookupEntity<User>("Users", googleId, email)).InternalId
-            ), new CookieOptions()
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                IsEssential = true,
-            });
         }
 
         public async Task<User> LookupCurrentUser(HttpContext context)

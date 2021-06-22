@@ -5,24 +5,36 @@ using Newtonsoft.Json;
 
 namespace ChonkyReviews.Models
 {
+    public record UserIn(string Email, string ProfileName);
+
     public class User : BaseEntity
     {
-        [JsonProperty]
-        public string UserId;
+        public User() { }
+
+        public User(string email)
+        {
+            this.Email = email;
+        }
 
         [JsonProperty]
-        public string ProfileName;
+        public string UserId { get; set; }
 
         [JsonProperty]
-        public string InternalId;
+        public string ProfileName { get; set; }
+
+        [JsonProperty]
+        public string DisplayName { get => ProfileName; set { } }
+
+        [JsonProperty]
+        public string Email { get; set; }
 
         [JsonIgnore]
-        public string Email;
+        public string Category => "User";
 
         [JsonIgnore]
-        public string GoogleId;
+        public override string PartitionKey { get => "User"; set { } }
 
-        public override string PartitionKey { get => GoogleId; set => GoogleId = value; }
+        [JsonIgnore]
         public override string RowKey { get => Email; set => Email = value; }
     }
 }

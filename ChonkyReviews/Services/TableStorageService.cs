@@ -50,6 +50,18 @@ namespace ChonkyReviews.Services
             return result;
         }
 
+        public async IAsyncEnumerable<T> LookupAllEntities<T>(string tableName, [EnumeratorCancellation] CancellationToken ct = default) where T : BaseEntity, new()
+        {
+            var table = this[tableName];
+            TableContinuationToken continuation = null;
+            do
+            {
+                var results = await table.ExecuteQuerySegmentedAsync(new TableQuery<TableStorageEntityAdapter<T>>(), continuation);
+                foreach (var result in results) yield return result.InnerObject;
+                continuation = results.ContinuationToken;
+            } while (continuation != null && !ct.IsCancellationRequested);
+        }
+
         public async IAsyncEnumerable<T> LookupEntities<T>(string tableName, string partitionKey, [EnumeratorCancellation] CancellationToken ct = default) where T : BaseEntity, new()
         {
             var table = this[tableName];
@@ -60,6 +72,27 @@ namespace ChonkyReviews.Services
                 foreach (var result in results) yield return result.InnerObject;
                 continuation = results.ContinuationToken;
             } while (continuation != null && !ct.IsCancellationRequested);
+        }
+
+        public Task<T> LookupEntity<T>(string tableName, T entity) where T : BaseEntity, new()
+        {
+            return LookupEntity<T>(tableName, entity.PartitionKey, entity.RowKey);
+        }
+
+        public async Task<T> DeleteEntity<T>(string tableName, T entity) where T : BaseEntity, new()
+        {
+            var table = this[tableName];
+
+            var res = await table.ExecuteAsync(TableOperation.Delete(new TableStorageEntityAdapter<T>(await LookupEntity(tableName, entity))));
+            return res.Result is TableStorageEntityAdapter<T> obj ? obj.InnerObject : null;
+        }
+
+        public async Task<T> MergeEntity<T>(string tableName, T entity) where T : BaseEntity, new()
+        {
+            var table = this[tableName];
+
+            var res = await table.ExecuteAsync(TableOperation.InsertOrMerge(new TableStorageEntityAdapter<T>(entity)));
+            return res.Result is TableStorageEntityAdapter<T> obj ? obj.InnerObject : null;
         }
 
         public async Task<T> LookupEntity<T>(string tableName, string partitionKey, string rowKey) where T : BaseEntity, new()

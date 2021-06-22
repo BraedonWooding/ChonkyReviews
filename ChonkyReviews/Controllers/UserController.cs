@@ -18,25 +18,32 @@ namespace ChonkyReviews.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly TableStorageService _tableStorage;
-        private readonly AuthService _auth;
 
-        public UserController(ILogger<UserController> logger, TableStorageService tableStorage, AuthService auth)
+        public UserController(ILogger<UserController> logger, TableStorageService tableStorage)
         {
             _logger = logger;
             _tableStorage = tableStorage;
-            _auth = auth;
         }
 
         [HttpGet]
-        public Task<User> Get()
+        [Route("all")]
+        public async Task<List<User>> GetAllUsers()
         {
-            return _tableStorage.LookupEntity<User>("Users", "abc", "demo@chonky.com");
+            return await _tableStorage.LookupAllEntities<User>("Users").ToListAsync();
+        }
+
+        [HttpPost]
+        public async Task UpdateUser([FromBody] UserIn user)
+        {
+            await _tableStorage.MergeEntity("Users", new User(user.Email) {
+                ProfileName = user.ProfileName
+            });
         }
 
         [HttpGet]
-        public async Task Auth()
+        public Task<User> Get(string email)
         {
-            await _auth.AddAuthCookie(HttpContext, "abc", "demo@chonky.com");
+            return _tableStorage.LookupEntity<User>("Users", new User(email));
         }
     }
 }

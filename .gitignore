@@ -11,6 +11,13 @@ autom4te.cache/
 tarballs/
 test-results/
 
+ChonkyReviews/src/main.ts
+ChonkyReviews/src/quasar-user-options.ts
+ChonkyReviews/src/*.js
+ChonkyReviews/src/*.js.map
+
+*.js.map
+
 # Mac bundle stuff
 *.dmg
 *.app

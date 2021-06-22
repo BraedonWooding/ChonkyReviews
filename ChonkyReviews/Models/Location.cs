@@ -4,22 +4,31 @@ using Newtonsoft.Json;
 
 namespace ChonkyReviews.Models
 {
+    public record LocationIn(string AccountId, string LocationName);
+
     public class Location : BaseEntity
     {
-        [JsonIgnore, IgnoreProperty]
-        public string LocationId { get; private set; }
+        public Location()
+        {
+        }
 
-        [JsonIgnore, IgnoreProperty]
-        public string AccountId { get; private set; }
+        public Location(string accountId, string locationId)
+        {
+            this.AccountId = accountId;
+            this.LocationId = locationId;
+        }
 
-        [JsonIgnore, IgnoreProperty]
-        public Account Account => null;
+        [JsonProperty]
+        public string LocationId { get; set; }
 
-        [JsonProperty, IgnoreProperty]
+        [JsonProperty]
+        public string AccountId { get; set; }
+
+        [JsonProperty]
         public string Name => $"accounts/{AccountId}/locations/{LocationId}";
 
         [JsonProperty]
-        public string LocationName { get; private set; }
+        public string LocationName { get; set; }
 
         [JsonIgnore]
         public override string PartitionKey { get => AccountId; set => AccountId = value; }
