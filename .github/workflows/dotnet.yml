@@ -1,0 +1,38 @@
+name: .NET
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Install Swagger CLI
+      run:  dotnet tool install --global Swashbuckle.AspNetCore.Cli --version 6.1.4
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-restore
+    - name: Generate Swagger
+      run: swagger tofile --output "openapi.json" ./ChonkyReviews/bin/Debug/net5.0/ChonkyReviews.dll ChonkyReviews
+    - name: Generate Swagger UI
+      uses: Legion2/swagger-ui-action@v1
+      with:
+        tryItOutEnabled: false
+        output: swagger-ui
+        spec-file: openapi.json
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@4.1.4
+      with:
+        branch: gh-pages # The branch the action should deploy to.
+        folder: swagger-ui # The folder the action should deploy.
