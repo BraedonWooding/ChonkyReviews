@@ -32,18 +32,22 @@ namespace ChonkyReviews.Controllers
         [HttpPost]
         public async Task UpdateLocation([FromBody] LocationIn location)
         {
-            await _tableStorage.MergeEntity("Locations", new Location(location.AccountId, "location_" + new Guid().ToString("N"))
+            var locationId = "location_" + Guid.NewGuid().ToString("N");
+            if ((await _tableStorage.MergeEntity("Locations", new Location(location.AccountId, locationId)
             {
                 LocationName = location.LocationName
-            }); ;
+            })).Item3)
+            {
+                await _tableStorage.IncrementLedger("Location", locationId, "__Identity__");
+            }
         }
 
         [HttpGet]
         [Route("access")]
-        public async Task<IActionResult> HasAccess(string accountId, string locationId, string email)
+        public async Task<IActionResult> HasAccess(string accountId, string locationId, string userId)
         {
-            if (await _tableStorage.LookupEntity("UsersToAccounts", new Mapping<User, Account>(new User(email), new Account(accountId))) != null
-                || await _tableStorage.LookupEntity("UsersToLocations", new Mapping<User, Location>(new User(email), new Location(accountId, locationId))) != null)
+            if (await _tableStorage.LookupEntity("UsersToAccounts", new Mapping<User, Account>(new User(userId), new Account(accountId))) != null
+                || await _tableStorage.LookupEntity("UsersToLocations", new Mapping<User, Location>(new User(userId), new Location(accountId, locationId))) != null)
             {
                 return Ok();
             }
@@ -55,16 +59,24 @@ namespace ChonkyReviews.Controllers
 
         [HttpPut]
         [Route("access")]
-        public async Task AddAccess(string accountId, string locationId, string email)
+        public async Task AddAccess(string accountId, string locationId, string userId)
         {
-            await _tableStorage.MergeEntity("UsersToLocations", new Mapping<User, Location>(new User(email), new Location(accountId, locationId)));
+            if ((await _tableStorage.MergeEntity("UsersToLocations", new Mapping<User, Location>(new User(userId), new Location(accountId, locationId)))).Item3)
+            {
+                await _tableStorage.IncrementLedger("User", userId, "Locations");
+                await _tableStorage.IncrementLedger("Location", locationId, "UsersWithAccess");
+            }
         }
 
         [HttpDelete]
         [Route("access")]
-        public async Task RemoveAccess(string accountId, string locationId, string email)
+        public async Task RemoveAccess(string accountId, string locationId, string userId)
         {
-            await _tableStorage.DeleteEntity("UsersToLocations", new Mapping<User, Location>(new User(email), new Location(accountId, locationId)));
+            if (await _tableStorage.DeleteEntity("UsersToLocations", new Mapping<User, Location>(new User(userId), new Location(accountId, locationId))))
+            {
+                await _tableStorage.DecrementLedger("User", userId, "Locations");
+                await _tableStorage.DecrementLedger("Location", locationId, "UsersWithAccess");
+            }
         }
 
         [HttpGet]
@@ -77,8 +89,13 @@ namespace ChonkyReviews.Controllers
         [Route("forUser")]
         public async Task<List<Location>> GetForUser([FromBody] UserIn user)
         {
-            return await _tableStorage.LookupEntities<Mapping<User, Location>>("UsersToLocations", user.Email)
-                .SelectAwait(async x => await _tableStorage.LookupEntity("Locations", new Location(x.ValueCategory, x.Value))).ToListAsync();
+            return await _tableStorage.LookupEntities<Mapping<User, Location>>("UsersToLocations", user.UserId)
+                .SelectAwait(async x => await _tableStorage.LookupEntity("Locations", new Location(x.ValueCategory, x.Value)))
+                .Concat(
+                    _tableStorage.LookupEntities<Mapping<User, Account>>("UsersToAccounts", user.UserId)
+                        .SelectMany(x => _tableStorage.LookupEntities<Location>("Locations", x.Value))
+                )
+                .ToListAsync();
         }
     }
 }

@@ -35,15 +35,16 @@ namespace ChonkyReviews.Controllers
         [HttpPost]
         public async Task UpdateVisitor([FromBody] UserIn user)
         {
-            await _tableStorage.MergeEntity("Visitors", new User(user.Email) {
-                ProfileName = user.ProfileName
+            await _tableStorage.MergeEntity("Visitors", new User(user.UserId) {
+                ProfileName = user.ProfileName,
+                Email = user.Email
             });
         }
 
         [HttpGet]
-        public Task<User> Get(string email)
+        public Task<User> Get(string userId)
         {
-            return _tableStorage.LookupEntity<User>("Visitors", new User(email));
+            return _tableStorage.LookupEntity<User>("Visitors", new User(userId));
         }
     }
 }

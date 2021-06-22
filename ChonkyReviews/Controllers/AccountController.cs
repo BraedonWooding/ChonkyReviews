@@ -32,18 +32,22 @@ namespace ChonkyReviews.Controllers
         [HttpPost]
         public async Task UpdateAccount([FromBody] AccountIn account)
         {
-            await _tableStorage.MergeEntity("Accounts", new Account("account_" + new Guid().ToString("N"))
+            var accountId = "account_" + Guid.NewGuid().ToString("N");
+            if ((await _tableStorage.MergeEntity("Accounts", new Account(accountId)
             {
                 Type = account.Type,
                 AccountName = account.AccountName
-            });
+            })).Item3)
+            {
+                await _tableStorage.IncrementLedger("Account", accountId, "__Identity__");
+            }
         }
 
         [HttpGet]
         [Route("access")]
-        public async Task<IActionResult> HasAccess(string accountId, string email)
+        public async Task<IActionResult> HasAccess(string accountId, string userId)
         {
-            if (await _tableStorage.LookupEntity("UsersToAccounts", new Mapping<User, Account>(new User(email), new Account(accountId))) != null)
+            if (await _tableStorage.LookupEntity("UsersToAccounts", new Mapping<User, Account>(new User(userId), new Account(accountId))) != null)
             {
                 return Ok();
             }
@@ -55,16 +59,24 @@ namespace ChonkyReviews.Controllers
 
         [HttpPut]
         [Route("access")]
-        public async Task AddAccess(string accountId, string email)
+        public async Task AddAccess(string accountId, string userId)
         {
-            await _tableStorage.MergeEntity("UsersToAccounts", new Mapping<User, Account>(new User(email), new Account(accountId)));
+            if ((await _tableStorage.MergeEntity("UsersToAccounts", new Mapping<User, Account>(new User(userId), new Account(accountId)))).Item3)
+            {
+                await _tableStorage.IncrementLedger("User", userId, "Accounts");
+                await _tableStorage.IncrementLedger("Account", accountId, "UsersWithAccess");
+            }
         }
 
         [HttpDelete]
         [Route("access")]
-        public async Task RemoveAccess(string accountId, string email)
+        public async Task RemoveAccess(string accountId, string userId)
         {
-            await _tableStorage.DeleteEntity("UsersToAccounts", new Mapping<User, Account>(new User(email), new Account(accountId)));
+            if (await _tableStorage.DeleteEntity("UsersToAccounts", new Mapping<User, Account>(new User(userId), new Account(accountId))))
+            {
+                await _tableStorage.DecrementLedger("User", userId, "Accounts");
+                await _tableStorage.DecrementLedger("Account", accountId, "UsersWithAccess");
+            }
         }
 
         [HttpGet]
@@ -77,7 +89,7 @@ namespace ChonkyReviews.Controllers
         [Route("forUser")]
         public async Task<List<Account>> GetForUser([FromBody] UserIn user)
         {
-            return await _tableStorage.LookupEntities<Mapping<User, Account>>("UsersToAccounts", user.Email)
+            return await _tableStorage.LookupEntities<Mapping<User, Account>>("UsersToAccounts", user.UserId)
                 .SelectAwait(async x => await _tableStorage.LookupEntity("Accounts", new Account(x.Value))).ToListAsync();
         }
     }

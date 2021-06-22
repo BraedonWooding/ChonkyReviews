@@ -46,7 +46,7 @@ namespace ChonkyReviews.Models
         }
 
         [JsonProperty]
-        public string Name { get; set; }
+        public string Name => $"accounts/{AccountId}/locations/{LocationId}/reviews/{ReviewId}";
 
         [JsonProperty]
         public string ReviewId { get; set; }
@@ -86,7 +86,10 @@ namespace ChonkyReviews.Models
 
         [JsonProperty]
         public string LocationId { get; set; }
-        
+
+        [JsonProperty]
+        public string AccountId { get; set; }
+
         public override string PartitionKey { get => LocationId; set => LocationId = value; }
         public override string RowKey { get => ReviewId; set => ReviewId = value; }
     }

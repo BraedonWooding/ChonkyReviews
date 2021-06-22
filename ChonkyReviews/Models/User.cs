@@ -5,15 +5,15 @@ using Newtonsoft.Json;
 
 namespace ChonkyReviews.Models
 {
-    public record UserIn(string Email, string ProfileName);
+    public record UserIn(string Email, string ProfileName, string UserId);
 
     public class User : BaseEntity
     {
         public User() { }
 
-        public User(string email)
+        public User(string userId)
         {
-            this.Email = email;
+            this.UserId = userId;
         }
 
         [JsonProperty]
@@ -35,6 +35,6 @@ namespace ChonkyReviews.Models
         public override string PartitionKey { get => "User"; set { } }
 
         [JsonIgnore]
-        public override string RowKey { get => Email; set => Email = value; }
+        public override string RowKey { get => UserId; set => UserId = value; }
     }
 }
