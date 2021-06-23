@@ -182,7 +182,7 @@ export default {
       reviews.value = resp.data;
     }
 
-    watch(store.state.currentUser, getLocations);
+    watch(store.state, getLocations);
 
     async function getLocations() {
       if (!store.state.currentUser) {
