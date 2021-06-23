@@ -25,6 +25,14 @@ namespace ChonkyReviews.Controllers
 
         public record GMock_Account(string Name, string AccountName, Account.AccountType Type);
 
+        [Route("/api/lookupUser")]
+        [HttpGet]
+        public async Task<ActionResult<string>> GetUserId(string email)
+        {
+            var entity = await _tableStorage.LookupEntity("UserMapping", new AggregatedMapping("User", email));
+            return Ok(entity != null ? entity.userId : null);
+        }
+
         private string GetUserToken()
         {
             // user's have to authorize that is put their user id

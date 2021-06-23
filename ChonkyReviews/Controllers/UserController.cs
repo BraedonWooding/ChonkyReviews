@@ -35,11 +35,14 @@ namespace ChonkyReviews.Controllers
         [HttpPost]
         public async Task UpdateUser([FromBody] UserIn user)
         {
-            if ((await _tableStorage.MergeEntity("Users", new User(user.UserId ?? Guid.NewGuid().ToString("N")) {
+            var (cur, old, inserted) = await _tableStorage.MergeEntity("Users", new User(user.UserId ?? Guid.NewGuid().ToString("N")) {
                 ProfileName = user.ProfileName,
                 Email = user.Email
-            })).Item3)
+            });
+
+            if (inserted)
             {
+                await _tableStorage.MergeEntity("UserMapping", new AggregatedMapping("User", user.email, cur.userId));
                 await _tableStorage.IncrementLedger("User", "__Identity__", "__Identity__");
             }
         }

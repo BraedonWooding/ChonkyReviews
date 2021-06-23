@@ -9,7 +9,7 @@ namespace ChonkyReviews.Models
     {
         public AggregatedMapping() { }
 
-        public AggregatedMapping(string partition, string row, string reference)
+        public AggregatedMapping(string partition, string row, string reference = null)
         {
             this.PartitionKey = partition;
             this.RowKey = row;
