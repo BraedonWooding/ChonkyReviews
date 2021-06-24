@@ -51,6 +51,8 @@ namespace ChonkyReviews.Controllers
             // we don't support 'name' nor 'filter'
             // The user should encode their 'access' token
             string userToken = GetUserToken();
+            if (userToken == null) return Unauthorized();
+
             string lastId = null;
             List<GMock_Account> accounts = await _tableStorage.LookupEntities<Mapping<User, Account>>("UserToAccounts", userToken, pageToken, pageSize)
                     .SelectAwait(async x =>
@@ -72,6 +74,8 @@ namespace ChonkyReviews.Controllers
         public async Task<ActionResult<GMock_GetLocationsResult>> GetLocations([FromRoute] string accountId, string pageToken, int pageSize = 20)
         {
             string userToken = GetUserToken();
+            if (userToken == null) return Unauthorized();
+
             string lastId = null;
 
             if (!await CanAccess(accountId))
@@ -122,6 +126,8 @@ namespace ChonkyReviews.Controllers
             bool isDesc = orderBy.Contains("desc");
 
             string userToken = GetUserToken();
+            if (userToken == null) return Unauthorized();
+            
             string lastId = null;
 
             string table = "ReviewsUpdateTimeMappingDesc";
@@ -146,7 +152,8 @@ namespace ChonkyReviews.Controllers
                 .SelectAwait(async x =>
                 {
                     var review = await _tableStorage.LookupEntity<Review>("Reviews", new Review(locationId, x.Reference));
-                    lastId = review.LocationId;
+                    lastId = x.RowKey;
+
                     return new GMock_Review(review.Name, review.ReviewId, new GMock_Reviewer(review.Reviewer.ProfilePictureUrl, review.Reviewer.DisplayName, review.Reviewer.IsAnonymous),
                         review.StarRating, review.Comment, review.UpdateTime.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"),
                         review.UpdateTime.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'"),
@@ -161,6 +168,7 @@ namespace ChonkyReviews.Controllers
         private async Task<bool> CanAccess(string accountId, string locationId = null)
         {
             string userId = GetUserToken();
+
             if ((accountId != null && await _tableStorage.LookupEntity("UsersToAccounts", new Mapping<User, Account>(new User(userId), new Account(accountId))) != null)
                  || (locationId != null && await _tableStorage.LookupEntity("UsersToLocations", new Mapping<User, Location>(new User(userId), new Location(accountId, locationId))) != null))
             {

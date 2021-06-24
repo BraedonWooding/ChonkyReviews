@@ -12,7 +12,7 @@ namespace ChonkyReviews.Models
         public AggregatedMapping(string partition, string row, string reference = null)
         {
             this.PartitionKey = partition;
-            this.RowKey = row;
+            this.RowKey = row + (reference != null ? "_" + reference : "");
             this.Reference = reference;
         }
 
