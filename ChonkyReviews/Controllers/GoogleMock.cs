@@ -29,8 +29,8 @@ namespace ChonkyReviews.Controllers
         [HttpGet]
         public async Task<ActionResult<string>> GetUserId(string email)
         {
-            var entity = await _tableStorage.LookupEntity("UserMapping", new AggregatedMapping("User", email));
-            return Ok(entity?.Reference);
+            var entity = await _tableStorage.LookupEntity("UserMapping", new AggregatedMapping("User", email, manyToMany: false));
+            return entity != null ? Ok(entity.Reference) : NotFound();
         }
 
         private string GetUserToken()

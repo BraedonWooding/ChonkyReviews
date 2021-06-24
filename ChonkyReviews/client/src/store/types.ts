@@ -1,7 +1,7 @@
 export interface User {
   profileName: string;
   email: string;
-  userId: string;
+  userId: string | null;
 }
 
 export interface Account {

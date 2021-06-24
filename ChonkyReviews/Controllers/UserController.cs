@@ -42,7 +42,7 @@ namespace ChonkyReviews.Controllers
 
             if (inserted)
             {
-                await _tableStorage.MergeEntity("UserMapping", new AggregatedMapping("User", user.Email, cur.UserId));
+                await _tableStorage.MergeEntity("UserMapping", new AggregatedMapping("User", user.Email, cur.UserId, manyToMany: false));
                 await _tableStorage.IncrementLedger("User", "__Identity__", "__Identity__");
             }
         }

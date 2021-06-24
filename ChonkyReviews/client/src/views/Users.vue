@@ -74,6 +74,7 @@ export default {
     }
 
     async function createUser() {
+      newUser.value.userId = null;
       await axios.post("/api/user", newUser.value);
       await getUsers();
     }
