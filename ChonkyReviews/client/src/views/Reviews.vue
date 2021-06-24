@@ -68,7 +68,7 @@
           <q-scroll-area
             :thumb-style="thumbStyle"
             :bar-style="barStyle"
-            style="max-width: 450px; height: 50vh"
+            style="width: 25vw; height: 50vh"
           >
             <q-card
               v-for="review in reviews"

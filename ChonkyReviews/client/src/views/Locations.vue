@@ -24,14 +24,14 @@
           <q-toggle
             v-model="location.hasAccess"
             checked-icon="check"
-            :disable="location.hasAccess === null"
+            :disable="true"
             color="red"
             :label="`${
               location.hasAccess
                 ? 'User has access'
                 : location.hasAccess === null
                 ? 'User has access due to Account Access'
-                : 'User doesn\'t have access'
+                : ''
             }`"
             unchecked-icon="clear"
           />
@@ -115,20 +115,24 @@ export default {
 
     async function getLocations() {
       const resp = await axios.get("/api/location/all");
-      locations.value = await Promise.all(
+      locations.value = (await Promise.all(
         resp.data.map(async (x: any) => {
-          x.hasAccess = ref(await hasAccess(x.accountId, x.locationId));
-          watch(x.hasAccess, () => toggleAccess(x.accountId, x.locationId));
+          x.hasAccess = ref(await hasAccess(x.accountId));
           return x;
         })
-      );
+      )).filter((x: any) => x.hasAccess.value) as Location[];
     }
 
     watch(store.state, getLocations);
 
     async function getAccounts() {
       const resp = await axios.get("/api/account/all");
-      accounts.value = resp.data;
+      accounts.value = (await Promise.all(
+        resp.data.map(async (x: any) => {
+          x.hasAccess = ref(await hasAccess(x.accountId));
+          return x;
+        })
+      )).filter((x: any) => x.hasAccess.value) as Account[];
     }
 
     async function createLocation() {
@@ -136,26 +140,12 @@ export default {
       await getLocations();
     }
 
-    async function toggleAccess(accountId: string, id: string) {
-      ((await hasAccess(accountId, id)) === true ? axios.delete : axios.put)(
-        `/api/location/access?accountId=${accountId}&locationId=${id}&userId=${store.state.currentUser?.userId}`
-      );
-      await getLocations();
-    }
-
-    async function hasAccess(accountId: string, id: string) {
+    async function hasAccess(accountId: string) {
       try {
-        try {
-          await axios.get(
-            `/api/account/access?accountId=${accountId}&userId=${store.state.currentUser?.userId}`
-          );
-          return null;
-        } catch (e) {
-          await axios.get(
-            `/api/location/access?accountId=${accountId}&locationId=${id}&userId=${store.state.currentUser?.userId}`
-          );
-          return true;
-        }
+        await axios.get(
+          `/api/account/access?accountId=${accountId}&userId=${store.state.currentUser?.userId}`
+        );
+        return true;
       } catch (e) {
         return false;
       }
@@ -170,7 +160,6 @@ export default {
       newLocation,
       createLocation,
       hasAccess,
-      toggleAccess,
       accounts,
       hasUser: () => store.state.currentUser != null,
     };
