@@ -140,7 +140,7 @@ import axios from "axios";
 
 import { Location, Review, StarRating } from "../store/types";
 import UserSelect from "../components/UserSelect.vue";
-import { useStore } from 'vuex';
+import { useStore } from "../store";
 
 export default {
   name: "LayoutDefault",

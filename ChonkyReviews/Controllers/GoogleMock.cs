@@ -30,7 +30,7 @@ namespace ChonkyReviews.Controllers
         public async Task<ActionResult<string>> GetUserId(string email)
         {
             var entity = await _tableStorage.LookupEntity("UserMapping", new AggregatedMapping("User", email));
-            return Ok(entity != null ? entity.userId : null);
+            return Ok(entity?.Reference);
         }
 
         private string GetUserToken()
